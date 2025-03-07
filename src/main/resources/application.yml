@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: gateway
+
+server:
+  port: 8080
+
+loadbalancer:
+  strategy: RANDOM
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+    register-with-eureka: false
+    fetch-registry: true
+
+logging:
+  level:
+    com.netflix.eureka: DEBUG
