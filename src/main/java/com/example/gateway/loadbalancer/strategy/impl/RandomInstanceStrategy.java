@@ -6,7 +6,7 @@ import java.util.Random;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.lang.NonNull;
 
-public class RandomInstanceSelectionStrategy implements LoadBalancerStrategy {
+public class RandomInstanceStrategy implements LoadBalancerStrategy {
 
 	private final Random random = new Random();
 

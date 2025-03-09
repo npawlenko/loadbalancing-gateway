@@ -1,6 +1,5 @@
 package com.example.gateway.config;
 
-import com.example.gateway.filter.DynamicRoutingFilter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -9,17 +8,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RoutesConfig {
 
+	public static final String PARAM_SERVICE_ID = "serviceId";
+
 	@Bean
-	public RouteLocator customRouteLocator(RouteLocatorBuilder builder,
-		DynamicRoutingFilter dynamicRoutingFilter) {
+	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 		return builder.routes()
 			.route("any-service", r -> r
-				.path("/{serviceId}/**")
+				.path("/{" + PARAM_SERVICE_ID + "}/**")
 				.filters(f -> f
 					.stripPrefix(1)
-					.filter(dynamicRoutingFilter)
 				)
-				.uri("lb://dummy")) // Placeholder, dynamically changed in filter
+				.uri("lb://dummy")) // Placeholder
 			.build();
 	}
 

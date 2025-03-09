@@ -4,7 +4,7 @@ package com.example.gateway.loadbalancer;
 import com.example.gateway.loadbalancer.exception.LoadBalancerException;
 import com.example.gateway.loadbalancer.exception.NoAvailableServicesException;
 import com.example.gateway.loadbalancer.strategy.LoadBalancerStrategy;
-import java.util.Arrays;
+import com.example.gateway.utils.WebExchangeUtils;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -42,11 +42,7 @@ public class CustomLoadBalancer implements ReactorServiceInstanceLoadBalancer {
 		if (request.getContext() instanceof DefaultRequestContext context) {
 			Object clientRequest = context.getClientRequest();
 			if (clientRequest instanceof RequestData requestData) {
-				return Arrays
-					.stream(requestData.getUrl().getPath().split("/"))
-					.filter(segment -> !segment.isEmpty())
-					.findFirst()
-					.orElse(null);
+				return WebExchangeUtils.getServiceId(requestData);
 			}
 		}
 		return null;

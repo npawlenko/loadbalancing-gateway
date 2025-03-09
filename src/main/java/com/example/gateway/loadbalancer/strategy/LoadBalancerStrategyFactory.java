@@ -2,7 +2,7 @@ package com.example.gateway.loadbalancer.strategy;
 
 import com.example.gateway.loadbalancer.component.ActiveConnectionsCounter;
 import com.example.gateway.loadbalancer.strategy.impl.LeastConnectionsStrategy;
-import com.example.gateway.loadbalancer.strategy.impl.RandomInstanceSelectionStrategy;
+import com.example.gateway.loadbalancer.strategy.impl.RandomInstanceStrategy;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +19,7 @@ public class LoadBalancerStrategyFactory {
 
 	public LoadBalancerStrategyFactory(@Lazy ActiveConnectionsCounter activeConnectionsCounter) {
 		this.strategyMap = Map.of(
-			LoadBalancerStrategyEnum.RANDOM, new RandomInstanceSelectionStrategy(),
+			LoadBalancerStrategyEnum.RANDOM, new RandomInstanceStrategy(),
 			LoadBalancerStrategyEnum.LEAST_CONNECTIONS, new LeastConnectionsStrategy(activeConnectionsCounter));
 	}
 
