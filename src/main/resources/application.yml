@@ -5,8 +5,11 @@ spring:
 server:
   port: 8080
 
-loadbalancer:
-  strategy: RANDOM
+np:
+  loadbalancer:
+    strategy: LEAST_CONNECTIONS
+    weights:
+      products-service:7cbba038-1182-47cb-ab45-de98e8e77c52: 0
 
 eureka:
   client:
