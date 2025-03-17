@@ -3,6 +3,7 @@ package com.example.gateway.loadbalancer.strategy;
 import com.example.gateway.loadbalancer.component.ActiveConnectionsCounter;
 import com.example.gateway.loadbalancer.strategy.impl.LeastConnectionsStrategy;
 import com.example.gateway.loadbalancer.strategy.impl.RandomInstanceStrategy;
+import com.example.gateway.loadbalancer.strategy.impl.RoundRobinStrategy;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -15,13 +16,14 @@ public class LoadBalancerStrategyFactory {
 
 	private final Map<LoadBalancerStrategyEnum, Supplier<LoadBalancerStrategy>> strategyMap;
 
-	@Value("${loadbalancer.strategy}")
+	@Value("${np.loadbalancer.strategy}")
 	private LoadBalancerStrategyEnum strategy;
 
 	public LoadBalancerStrategyFactory(@Lazy ActiveConnectionsCounter activeConnectionsCounter) {
 		this.strategyMap = Map.of(
 			LoadBalancerStrategyEnum.RANDOM, RandomInstanceStrategy::new,
-			LoadBalancerStrategyEnum.LEAST_CONNECTIONS, () -> new LeastConnectionsStrategy(activeConnectionsCounter));
+			LoadBalancerStrategyEnum.LEAST_CONNECTIONS, () -> new LeastConnectionsStrategy(activeConnectionsCounter),
+			LoadBalancerStrategyEnum.ROUND_ROBIN, RoundRobinStrategy::new);
 	}
 
 	public LoadBalancerStrategy getStrategy() {
