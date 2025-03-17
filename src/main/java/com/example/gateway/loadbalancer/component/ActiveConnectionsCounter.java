@@ -5,12 +5,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
-@Lazy
+@ConditionalOnProperty(name = "loadbalancer.strategy", havingValue = "LEAST_CONNECTIONS")
 public class ActiveConnectionsCounter {
 
 	private final ConcurrentHashMap<ServiceInstance, AtomicInteger> activeConnections = new ConcurrentHashMap<>();
