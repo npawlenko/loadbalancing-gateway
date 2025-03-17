@@ -10,6 +10,6 @@ public class LoadBalancerConfig {
 
 	@Bean
 	public LoadBalancerStrategy loadBalancerStrategy(LoadBalancerStrategyFactory strategyFactory) {
-		return strategyFactory.getStrategy();
+		return strategyFactory.createStrategyAndGet();
 	}
 }

@@ -30,7 +30,7 @@ public class LoadBalancerStrategyFactory {
 			LoadBalancerStrategyEnum.WEIGHTED_ROUND_ROBIN, () -> new WeightedRoundRobinStrategy(loadBalancerProperties));
 	}
 
-	public LoadBalancerStrategy getStrategy() {
+	public LoadBalancerStrategy createStrategyAndGet() {
 		return Optional
 			.ofNullable(strategy)
 			.map(strategyMap::get)
