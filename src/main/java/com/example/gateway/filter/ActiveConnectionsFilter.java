@@ -15,7 +15,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
-@ConditionalOnProperty(name = "loadbalancer.strategy", havingValue = "LEAST_CONNECTIONS")
+@ConditionalOnProperty(name = "np.loadbalancer.strategy", havingValue = "LEAST_CONNECTIONS")
 @Slf4j
 @RequiredArgsConstructor
 public class ActiveConnectionsFilter implements GlobalFilter, Ordered {

@@ -10,7 +10,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(name = "loadbalancer.strategy", havingValue = "LEAST_CONNECTIONS")
+@ConditionalOnProperty(name = "np.loadbalancer.strategy", havingValue = "LEAST_CONNECTIONS")
 public class ActiveConnectionsCounter {
 
 	private final ConcurrentHashMap<ServiceInstance, AtomicInteger> activeConnections = new ConcurrentHashMap<>();
