@@ -13,10 +13,7 @@ public class RoundRobinStrategy implements LoadBalancerStrategy {
 	@Override
 	@NonNull
 	public ServiceInstance selectInstance(@NonNull List<ServiceInstance> instances) {
-		int index = currentInstanceIndex.getAndIncrement();
-		if (index >= instances.size()) {
-			currentInstanceIndex.set(0);
-		}
+		int index = currentInstanceIndex.getAndUpdate(i -> (i + 1) % instances.size());
 		return instances.get(index);
 	}
 }
