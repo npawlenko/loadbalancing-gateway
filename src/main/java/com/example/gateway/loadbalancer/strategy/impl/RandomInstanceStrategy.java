@@ -4,6 +4,7 @@ import com.example.gateway.loadbalancer.strategy.LoadBalancerStrategy;
 import java.util.List;
 import java.util.Random;
 import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.Request;
 import org.springframework.lang.NonNull;
 
 public class RandomInstanceStrategy implements LoadBalancerStrategy {
@@ -12,7 +13,7 @@ public class RandomInstanceStrategy implements LoadBalancerStrategy {
 
 	@NonNull
 	@Override
-	public ServiceInstance selectInstance(@NonNull List<ServiceInstance> instances) {
+	public ServiceInstance selectInstance(@NonNull List<ServiceInstance> instances, Request<?> request) {
 		int randomIndex = random.nextInt(instances.size());
 		return instances.get(randomIndex);
 	}

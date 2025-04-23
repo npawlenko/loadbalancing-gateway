@@ -28,27 +28,18 @@ public class CustomLoadBalancer implements ReactorServiceInstanceLoadBalancer {
 
 	@Override
 	public Mono<Response<ServiceInstance>> choose(Request request) {
-		String serviceId = extractServiceId(request);
+		String serviceId = WebExchangeUtils.getServiceId(request);
 		if (serviceId == null) {
 			throw new LoadBalancerException("No service parameter provided");
 		}
 
 		return getServiceInstanceList(request, serviceId)
-			.map(instances -> chooseInstance(serviceId, instances))
+			.map(instances -> chooseInstance(serviceId, instances, request))
 			.map(ServiceInstanceResponse::new);
 	}
 
-	private String extractServiceId(Request<?> request) {
-		if (request.getContext() instanceof DefaultRequestContext context) {
-			Object clientRequest = context.getClientRequest();
-			if (clientRequest instanceof RequestData requestData) {
-				return WebExchangeUtils.getServiceId(requestData);
-			}
-		}
-		return null;
-	}
-
-	private Mono<List<ServiceInstance>> getServiceInstanceList(Request<?> request, String serviceId) {
+	private Mono<List<ServiceInstance>> getServiceInstanceList(Request<?> request,
+		String serviceId) {
 		return Objects.requireNonNull(clientFactory
 				.getProvider(
 					serviceId, ServiceInstanceListSupplier.class)
@@ -57,13 +48,14 @@ public class CustomLoadBalancer implements ReactorServiceInstanceLoadBalancer {
 			.next();
 	}
 
-	private ServiceInstance chooseInstance(String serviceId, List<ServiceInstance> instances) {
+	private ServiceInstance chooseInstance(String serviceId, List<ServiceInstance> instances,
+		Request<?> request) {
 		if (instances == null || instances.isEmpty()) {
 			throw new NoAvailableServicesException(serviceId);
 		}
 		if (instances.size() == 1) {
 			return instances.getFirst();
 		}
-		return strategy.selectInstance(instances);
+		return strategy.selectInstance(instances, request);
 	}
 }

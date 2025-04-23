@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.Request;
 import org.springframework.lang.NonNull;
 
 @RequiredArgsConstructor
@@ -17,7 +18,8 @@ public class WeightedRoundRobinStrategy implements LoadBalancerStrategy {
 
 	@Override
 	@NonNull
-	public ServiceInstance selectInstance(@NonNull List<ServiceInstance> instances) {
+	public ServiceInstance selectInstance(@NonNull List<ServiceInstance> instances,
+		Request<?> request) {
 		int weight = currentInstanceWeight.get();
 		if (weight > 0 && currentInstanceWeight.compareAndSet(weight, weight - 1)) {
 			return instances.get(currentInstanceIndex.get());

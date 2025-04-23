@@ -1,5 +1,6 @@
 package com.example.gateway.loadbalancer.strategy.impl;
 
+import com.example.gateway.config.properties.LoadBalancerProperties;
 import com.example.gateway.loadbalancer.component.ActiveConnectionsCounter;
 import com.example.gateway.loadbalancer.strategy.LoadBalancerStrategyWithFallback;
 import java.util.Comparator;
@@ -10,8 +11,9 @@ import org.springframework.cloud.client.loadbalancer.Request;
 import org.springframework.lang.NonNull;
 
 @RequiredArgsConstructor
-public class LeastConnectionsStrategy extends LoadBalancerStrategyWithFallback {
+public class WeightedLeastConnectionsStrategy extends LoadBalancerStrategyWithFallback {
 
+	private final LoadBalancerProperties loadBalancerProperties;
 	private final ActiveConnectionsCounter activeConnectionsCounter;
 
 	@NonNull
@@ -19,9 +21,18 @@ public class LeastConnectionsStrategy extends LoadBalancerStrategyWithFallback {
 	public ServiceInstance selectInstance(@NonNull List<ServiceInstance> instances,
 		Request<?> request) {
 		return instances.stream()
-			.min(Comparator.comparingInt(
-				instance -> activeConnectionsCounter.getActiveConnectionsMap()
-					.getOrDefault(instance, 0)))
+			.min(Comparator.comparingDouble(instance ->
+				getActiveConnections(instance)
+					/ (double) getWeight(instance)))
 			.orElseGet(() -> selectInstanceFallback(instances, request));
+	}
+
+	private Integer getActiveConnections(ServiceInstance instance) {
+		return activeConnectionsCounter.getActiveConnectionsMap().getOrDefault(instance, 0);
+	}
+
+	private Integer getWeight(ServiceInstance instance) {
+		return loadBalancerProperties.getWeights()
+			.getOrDefault(instance.getInstanceId(), 1);
 	}
 }

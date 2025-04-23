@@ -7,7 +7,7 @@ server:
 
 np:
   loadbalancer:
-    strategy: LEAST_CONNECTIONS
+    strategy: LEAST_RESPONSE_TIME
     weights:
       products-service:7cbba038-1182-47cb-ab45-de98e8e77c52: 0
 
