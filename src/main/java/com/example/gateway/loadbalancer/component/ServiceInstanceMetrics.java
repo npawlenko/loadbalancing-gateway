@@ -18,6 +18,11 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ServiceInstanceMetrics {
 
+	private static final String MEASUREMENTS_STATISTIC = "statistic";
+	private static final String MEASUREMENTS_VALUE = "value";
+	private static final String MEASUREMENTS_STATISTIC_COUNT = "COUNT";
+	private static final String MEASUREMENTS_STATISTIC_TOTAL_TIME = "TOTAL_TIME";
+
 	private final ReactiveDiscoveryClient reactiveDiscoveryClient;
 
 	private final WebClient webClient = WebClient.create();
@@ -55,8 +60,8 @@ public class ServiceInstanceMetrics {
 		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> measurements = (List<Map<String, Object>>) metrics.get(
 			"measurements");
-		Double count = getMeasurement("COUNT", measurements);
-		Double totalTime = getMeasurement("TOTAL_TIME", measurements);
+		Double count = getMeasurement(MEASUREMENTS_STATISTIC_COUNT, measurements);
+		Double totalTime = getMeasurement(MEASUREMENTS_STATISTIC_TOTAL_TIME, measurements);
 		Double avgTime = totalTime / count;
 		responseTimes.put(instance, avgTime);
 	}
@@ -67,8 +72,11 @@ public class ServiceInstanceMetrics {
 			throw new IllegalStateException(
 				"Could not fetch measurements statistic '" + statistic + "'");
 		}
-		return measurements.stream().filter(m -> m.get("statistic").equals(statistic)).findFirst()
-			.map(e -> e.get("value")).map(e -> (T) e).orElseThrow(() -> new IllegalStateException(
+		//noinspection unchecked
+		return measurements.stream().filter(m -> m.get(MEASUREMENTS_STATISTIC).equals(statistic))
+			.findFirst()
+			.map(e -> e.get(MEASUREMENTS_VALUE)).map(e -> (T) e)
+			.orElseThrow(() -> new IllegalStateException(
 				"Could not fetch measurements statistic '" + statistic + "'"));
 	}
 }
