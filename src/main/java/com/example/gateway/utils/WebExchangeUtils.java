@@ -1,6 +1,5 @@
 package com.example.gateway.utils;
 
-import com.example.gateway.config.RoutesConfig;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -11,6 +10,7 @@ import org.springframework.cloud.client.loadbalancer.DefaultRequestContext;
 import org.springframework.cloud.client.loadbalancer.Request;
 import org.springframework.cloud.client.loadbalancer.RequestData;
 import org.springframework.cloud.client.loadbalancer.Response;
+import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
@@ -18,22 +18,21 @@ import org.springframework.web.server.ServerWebExchange;
 @UtilityClass
 public class WebExchangeUtils {
 
-	public String getServiceId(Request<?> request) {
-		return getRequestData(request).map(WebExchangeUtils::getServiceId).orElse(null);
-	}
+	public String extractServiceId(Request<?> request) {
+		return getRequestData(request)
+			.map(requestData -> {
+				Route route = (Route) requestData.getAttributes()
+					.get(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
 
-	public String getServiceId(RequestData requestData) {
-		@SuppressWarnings("unchecked")
-		Map<String, String> uriTemplateVariables = (Map<String, String>) requestData.getAttributes()
-			.get(ServerWebExchangeUtils.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-		return getServiceId(uriTemplateVariables);
-	}
-
-	private String getServiceId(Map<String, String> uriTemplateVariables) {
-		return Optional
-			.ofNullable(uriTemplateVariables)
-			.map(m -> m.get(RoutesConfig.PARAM_SERVICE_ID))
-			.orElseThrow(() -> new IllegalStateException("No service id set"));
+				if (route != null && route.getUri() != null) {
+					String uri = route.getUri().toString();
+					if (uri.startsWith("lb://")) {
+						return uri.substring(5);
+					}
+				}
+				return null;
+			})
+			.orElse(null);
 	}
 
 	public String getClientIp(Request<?> request) {

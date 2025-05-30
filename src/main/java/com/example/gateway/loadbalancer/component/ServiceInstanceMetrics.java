@@ -24,7 +24,6 @@ public class ServiceInstanceMetrics {
 	private static final String MEASUREMENTS_STATISTIC_TOTAL_TIME = "TOTAL_TIME";
 
 	private final ReactiveDiscoveryClient reactiveDiscoveryClient;
-
 	private final WebClient webClient = WebClient.create();
 	private final Map<ServiceInstance, Double> responseTimes = new ConcurrentHashMap<>();
 
@@ -41,7 +40,7 @@ public class ServiceInstanceMetrics {
 	}
 
 	private Mono<Void> fetchResponseTime(ServiceInstance instance) {
-		String url = instance.getUri() + "/actuator/metrics/http.server.requests";
+		String url = getInstanceUrl(instance);
 
 		//noinspection unchecked
 		return webClient.get()
@@ -50,10 +49,17 @@ public class ServiceInstanceMetrics {
 			.bodyToMono(Map.class)
 			.timeout(Duration.ofSeconds(2))
 			.doOnNext(metrics -> updateResponseTime(instance, metrics))
-			.doOnError(e -> log.error("Failed to fetch metrics from {}:{}", instance.getServiceId(),
-				instance.getInstanceId()))
+			.doOnError(e -> log.error("Failed to fetch metrics from {} ({})\n{}", instance.getInstanceId(),
+				url, e.getStackTrace()))
 			.onErrorResume(e -> Mono.empty())
 			.then();
+	}
+
+	private String getInstanceUrl(ServiceInstance instance) {
+		String scheme = instance.getScheme() != null ? instance.getScheme() : "http";
+		int port = instance.getPort();
+		return scheme + "://" + instance.getHost() + ":" + port
+			+ "/actuator/metrics/http.server.requests";
 	}
 
 	private void updateResponseTime(ServiceInstance instance, Map<String, Object> metrics) {

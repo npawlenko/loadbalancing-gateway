@@ -1,15 +1,23 @@
 spring:
   application:
     name: gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
 
 server:
   port: 8080
 
 np:
   loadbalancer:
-    strategy: LEAST_RESPONSE_TIME
+    strategy: WEIGHTED_ROUND_ROBIN
     weights:
-      products-service:7cbba038-1182-47cb-ab45-de98e8e77c52: 0
+      products-service-0: 1
+      products-service-1: 2
 
 eureka:
   client:

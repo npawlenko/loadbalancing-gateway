@@ -26,7 +26,8 @@ public class CustomLoadBalancer implements ReactorServiceInstanceLoadBalancer {
 
 	@Override
 	public Mono<Response<ServiceInstance>> choose(Request request) {
-		String serviceId = WebExchangeUtils.getServiceId(request);
+		String serviceId = WebExchangeUtils.extractServiceId(request);
+
 		if (serviceId == null) {
 			throw new LoadBalancerException("No service parameter provided");
 		}
